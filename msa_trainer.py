@@ -6,7 +6,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from Dataset import bAbIDataset
-from model import MemN2N
+from msa_model import MemN2N
 
 
 class Trainer:
@@ -26,7 +26,7 @@ class Trainer:
         settings = {
             "use_cuda": config.cuda,
             "num_vocab": self.train_data.num_vocab,
-            "embedding_dim": 20,
+            "embedding_dim": 6,
             "sentence_size": self.train_data.sentence_size,
             "max_hops": config.max_hops
         }

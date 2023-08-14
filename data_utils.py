@@ -110,11 +110,17 @@ def vectorize_data(data, word_idx, sentence_size, memory_size):
     for story, query, answer in data:
         ss = []
         for i, sentence in enumerate(story, 1):
+            ## ls --> length of padded tokens for the sentence
             ls = max(0, sentence_size - len(sentence))
+            ## ss --> a list which contains the numeric rep. of the sentence, possibly padded with
+            ## the length ls
             ss.append([word_idx[w] for w in sentence] + [0] * ls)
 
         # take only the most recent sentences that fit in memory
         ss = ss[::-1][:memory_size][::-1]
+
+        ## the line above basically captures the most recent sentences of the stroy(as far as the memory-
+        ## size allows
 
         # Make the last word of each sentence the time 'word' which
         # corresponds to vector of lookup table
@@ -133,7 +139,9 @@ def vectorize_data(data, word_idx, sentence_size, memory_size):
         for a in answer:
             y[word_idx[a]] = 1
 
-        S.append(ss); Q.append(q); A.append(y)
+        S.append(ss)
+        Q.append(q)
+        A.append(y)
     return np.array(S), np.array(Q), np.array(A)
 
 

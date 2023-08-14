@@ -1,6 +1,6 @@
-from train import main, parse_config
+from train import main, parse_config, main_msa
 
 
 if __name__ == '__main__':
     config = parse_config()
-    main(config)
+    model = main_msa(config)
