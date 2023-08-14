@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.init as init
 from torch.autograd import Variable
-from utils import find_greates_divisor
+from utils import find_greates_divisor, find_smallest_divisor
 
 
 def position_encoding(sentence_size, embedding_dim):
@@ -37,6 +37,40 @@ class AttrProxy(object):
         return getattr(self.module, self.prefix + str(i))
 
 
+class SingleMSA(nn.Module):
+
+    def __init__(self, embedding_size, num_heads):
+
+        super(SingleMSA, self).__init__()
+
+
+        self.msa = nn.MultiheadAttention(embed_dim=embedding_size, num_heads=num_heads)
+
+
+    def forward(self, x):
+
+        return self.msa(x, x, x)[0]
+
+
+class MSAStack(nn.Module):
+
+    def __init__(self, n, embedding_dim, num_heads):
+
+        super(MSAStack, self).__init__()
+
+
+        self.msa_stack = nn.Sequential(
+            *[SingleMSA(embedding_size=embedding_dim, num_heads=num_heads) for _ in range(n)]
+        )
+
+
+    def forward(self, x):
+
+        return self.msa_stack(x)
+
+
+
+
 class MemN2N(nn.Module):
     def __init__(self, settings):
         super(MemN2N, self).__init__()
@@ -47,7 +81,8 @@ class MemN2N(nn.Module):
         sentence_size = settings["sentence_size"]
         self.max_hops = settings["max_hops"]
 
-        self.msa = nn.MultiheadAttention(embed_dim=embedding_dim, num_heads=find_greates_divisor(embedding_dim))
+
+        self.msa = MSAStack(embedding_dim=embedding_dim, num_heads=find_greates_divisor(embedding_dim), n=3)
 
         for hop in range(self.max_hops + 1):
             C = nn.Embedding(num_vocab, embedding_dim, padding_idx=0)
@@ -72,7 +107,7 @@ class MemN2N(nn.Module):
         # print(f'query shape: {query.shape}')
         query_embed = self.C[0](query)
 
-        query_embed, _ = self.msa(query_embed, query_embed, query_embed)
+        query_embed= self.msa(query_embed)
         # weired way to perform reduce_dot
         # print(f'query embed: {query_embed.shape}')
         # print(f'encoding shape: {self.encoding.shape}')
@@ -81,7 +116,7 @@ class MemN2N(nn.Module):
 
         for hop in range(self.max_hops):
             embed_A = self.C[hop](story.view(story.size(0), -1))
-            embed_A, _ = self.msa(embed_A, embed_A, embed_A)
+            embed_A= self.msa(embed_A)
             embed_A = embed_A.view(story_size + (embed_A.size(-1),))
 
             encoding = self.encoding.unsqueeze(0).unsqueeze(1).expand_as(embed_A)
@@ -91,7 +126,7 @@ class MemN2N(nn.Module):
             prob = self.softmax(torch.sum(m_A * u_temp, 2))
 
             embed_C = self.C[hop + 1](story.view(story.size(0), -1))
-            embed_C, _ = self.msa(embed_C, embed_C, embed_C)
+            embed_C = self.msa(embed_C)
             embed_C = embed_C.view(story_size + (embed_C.size(-1),))
             m_C = torch.sum(embed_C * encoding, 2)
 
