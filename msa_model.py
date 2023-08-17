@@ -49,7 +49,7 @@ class SingleMSA(nn.Module):
 
     def forward(self, x):
 
-        return self.msa(x, x, x)[0]
+        return self.msa(x, x, x)[0] + x
 
 
 class MSAStack(nn.Module):
