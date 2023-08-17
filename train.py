@@ -25,7 +25,7 @@ def main(config):
     return model
 
 def main_msa(config):
-    t = msa_trainer.Trainer(config)
+    t = trainer.Trainer(config)
     model = t.fit()
 
     return model
