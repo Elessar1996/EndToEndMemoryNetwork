@@ -5,7 +5,7 @@ import msa_trainer
 def parse_config():
     parser = argparse.ArgumentParser()
     parser.add_argument("--cuda", action='store_true')
-    parser.add_argument("--dataset_dir", type=str, default="data/data/en")
+    parser.add_argument("--dataset_dir", type=str, default="data/data/en-10k")
     parser.add_argument("--task", type=int, default=1)  #default 1
     parser.add_argument("--max_hops", type=int, default=1)#default 3
     parser.add_argument("--batch_size", type=int, default=32)
