@@ -69,6 +69,46 @@ class MSAStack(nn.Module):
         return self.msa_stack(x)
 
 
+class GPTBlock(nn.Module):
+
+    def __init__(self, embedding_dim, num_heads):
+
+        super(GPTBlock, self).__init__()
+
+        self.msa = SingleMSA(embedding_size=embedding_dim, num_heads=num_heads)
+
+        self.layer_norm = nn.LayerNorm(normalized_shape=embedding_dim)
+
+        self.feed_forward = nn.Linear(in_features=embedding_dim, out_features=embedding_dim)
+
+    def forward(self, x):
+
+        x = self.msa(x, x, x) + x
+
+        x = self.layer_norm(x)
+
+        x = self.layer_norm(x)
+
+        x = self.feed_forward(x) + x
+
+        x = self.layer_norm(x)
+
+        return x
+
+
+class GPTStack(nn.Module):
+
+    def __init__(self, embedding_dim, num_heads, n):
+
+        super(GPTStack, self).__init__()
+
+        self.gpt_stack = nn.Sequential(*[GPTBlock(embedding_dim=embedding_dim, num_heads=num_heads) for _ in range(n)])
+
+
+    def forward(self, x):
+
+        return self.gpt_stack(x)
+
 
 
 class MemN2N(nn.Module):
@@ -82,7 +122,7 @@ class MemN2N(nn.Module):
         self.max_hops = settings["max_hops"]
 
 
-        self.msa = MSAStack(embedding_dim=embedding_dim, num_heads=find_greates_divisor(embedding_dim), n=3)
+        self.msa = GPTStack(embedding_dim=embedding_dim, num_heads=find_greates_divisor(embedding_dim), n=6)
 
         for hop in range(self.max_hops + 1):
             C = nn.Embedding(num_vocab, embedding_dim, padding_idx=0)
