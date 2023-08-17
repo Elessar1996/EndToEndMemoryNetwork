@@ -83,7 +83,7 @@ class GPTBlock(nn.Module):
 
     def forward(self, x):
 
-        x = self.msa(x, x, x) + x
+        x = self.msa(x) + x
 
         x = self.layer_norm(x)
 
