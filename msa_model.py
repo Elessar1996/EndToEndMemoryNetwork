@@ -122,7 +122,7 @@ class MemN2N(nn.Module):
         self.max_hops = settings["max_hops"]
 
 
-        self.msa = MSAStack(embedding_dim=embedding_dim, num_heads=find_greates_divisor(embedding_dim), n=6)
+        self.msa = MSAStack(embedding_dim=embedding_dim, num_heads=find_greates_divisor(embedding_dim), n=3)
 
         for hop in range(self.max_hops + 1):
             C = nn.Embedding(num_vocab, embedding_dim, padding_idx=0)
