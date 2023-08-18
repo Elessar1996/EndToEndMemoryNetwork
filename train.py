@@ -7,7 +7,7 @@ def parse_config():
     parser.add_argument("--cuda", action='store_true')
     parser.add_argument("--dataset_dir", type=str, default="data/data/en-10k")
     parser.add_argument("--task", type=int, default=12)  #default 1
-    parser.add_argument("--max_hops", type=int, default=1)#default 3
+    parser.add_argument("--max_hops", type=int, default=20)#default 3
     parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--max_epochs", type=int, default=500)
     parser.add_argument("--lr", type=float, default=0.01)
