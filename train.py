@@ -9,7 +9,7 @@ def parse_config():
     parser.add_argument("--task", type=int, default=12)  #default 1
     parser.add_argument("--max_hops", type=int, default=1)#default 3
     parser.add_argument("--batch_size", type=int, default=32)
-    parser.add_argument("--max_epochs", type=int, default=1000)
+    parser.add_argument("--max_epochs", type=int, default=500)
     parser.add_argument("--lr", type=float, default=0.01)
     parser.add_argument("--decay_interval", type=int, default=25)
     parser.add_argument("--decay_ratio", type=float, default=0.5)
